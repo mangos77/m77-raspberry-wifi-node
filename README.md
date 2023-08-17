@@ -1,5 +1,6 @@
-***My natural language is Spanish. All texts have been translated with Google Translator.***
 ***Si quieres ver el documento en español, por favor consulta el archivo README_es.md***
+
+***My natural language is Spanish. All texts have been translated with Google Translator.***
 ---
 
 # m77-raspberry-wifi-node
