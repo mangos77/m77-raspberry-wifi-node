@@ -1,0 +1,33 @@
+{
+  "name": "m77-raspberry-wifi-node",
+  "version": "1.0.0",
+  "description": "Module in nodejs to configure Wifi connections on Raspberry Pi (managed by wpa_cli from wpa_supplicant)",
+  "main": "src/RaspberryWIFI.js",
+  "scripts": {
+    "dev": "node test"
+  },
+  "keywords": [
+    "wifi",
+    "wifi connection",
+    "wpa_cli",
+    "wpa_supplicant",
+    "raspberry",
+    "raspberry Pi",
+    "node",
+    "nodejs",
+    "node.js",
+    "rpi",
+    "raspi",
+    "linux"
+  ],
+  "author": "Ing. Carlos Yerena - mangos77",
+  "homepage": "https://github.com/mangos77/m77-raspberry-wifi-node",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mangos77/m77-raspberry-wifi-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mangos77/m77-raspberry-wifi-node/issues"
+  },
+  "license": "MIT"
+}
