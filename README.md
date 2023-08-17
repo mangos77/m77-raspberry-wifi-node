@@ -13,7 +13,7 @@ Because I have benefited a lot from the work of other people and organizations t
 I have dedicated several hours to try to give the necessary functionalities for a correct development of applications in node.js.
 
 I hope you find it very useful and recommend it so that it reaches more developers :-)
-## Instalación
+## Install
 ```
 npm install m77-raspberry-wifi-node
 ```
@@ -30,7 +30,6 @@ async function start() {
 start()
 ```
 
-## Use
 ## Methods
 *** **Important note: All methods are asynchronous**
 

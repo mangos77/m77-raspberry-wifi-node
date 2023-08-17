@@ -10,7 +10,7 @@ Le he dedicado varias horas para intentar dar las funcionalidades necesarias par
 
 Espero que les sea de gran utilidad y la recomienden para que llegue a más desarrolladores :-)
 
-## Instalación
+## Instalar
 ```
 npm install m77-raspberry-wifi-node
 ```
