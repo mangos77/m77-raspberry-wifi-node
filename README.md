@@ -15,7 +15,7 @@ I have dedicated several hours to try to give the necessary functionalities for 
 I hope you find it very useful and recommend it so that it reaches more developers :-)
 ## Instalación
 ```
-npm install https://github.com/mangos77/m77-raspberry-wifi-node
+npm install m77-raspberry-wifi-node
 ```
 
 ## Use

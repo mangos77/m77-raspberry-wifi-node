@@ -12,7 +12,7 @@ Espero que les sea de gran utilidad y la recomienden para que llegue a más desa
 
 ## Instalación
 ```
-npm install https://github.com/mangos77/m77-raspberry-wifi-node
+npm install m77-raspberry-wifi-node
 ```
 
 ## Uso
