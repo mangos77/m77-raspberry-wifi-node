@@ -522,7 +522,6 @@ class M77RaspberryWIFI {
             })
 
             const cleanResult = result.map(row => {
-                console.log(row.ssid)
                 try {
                     row.ssid = row.ssid.replace(/\\x00/g, '')
                 } catch (e) { }
