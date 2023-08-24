@@ -522,7 +522,10 @@ class M77RaspberryWIFI {
             })
 
             const cleanResult = result.map(row => {
-                row.ssid = row.ssid.replace(/\\x00/g, '')
+                console.log(row.ssid)
+                try {
+                    row.ssid = row.ssid.replace(/\\x00/g, '')
+                } catch (e) { }
                 return row
             })
 
@@ -598,10 +601,10 @@ class M77RaspberryWIFI {
 
             const remove = await this.#removeAllNetworks()
             if (remove === false) { resolve({ success: false, msg: `Could not delete saved Wi-Fi networks in ${$this.#device}` }); return false }
-            
+
             const saveConfig = await this.#wpa(`save_config`)
             if (saveConfig.trim() !== 'OK') {
-                resolve({success: false, msg: `Failed to save delete changes to interface configuration ${this.#device}`})
+                resolve({ success: false, msg: `Failed to save delete changes to interface configuration ${this.#device}` })
             } else {
                 resolve({ success: true, msg: `Removed all Wifi network configurations for interface ${this.#device}` })
             }
