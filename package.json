@@ -1,6 +1,6 @@
 {
   "name": "m77-raspberry-wifi-node",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Module in nodejs to configure Wifi connections on Raspberry Pi (managed by wpa_cli from wpa_supplicant)",
   "main": "./src/m77-raspberry-wifi-node.js",
   "scripts": {

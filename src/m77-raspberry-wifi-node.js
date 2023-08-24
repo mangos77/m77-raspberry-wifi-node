@@ -521,7 +521,12 @@ class M77RaspberryWIFI {
                 return net
             })
 
-            resolve({ success: true, msg: `List of scanned Wi-Fi networks was obtained`, data: result })
+            const cleanResult = result.map(row => {
+                row.ssid = row.ssid.replace(/\\x00/g, '')
+                return row
+            })
+
+            resolve({ success: true, msg: `List of scanned Wi-Fi networks was obtained`, data: cleanResult })
 
         })
     }
