@@ -66,7 +66,7 @@ class M77RaspberryWIFI {
                     return false
                 }
                 scanned = await this.#wpa('scan')
-                scanned = scanned.trim()
+                try { scanned = scanned.trim() } catch(e){}
                 if (scanned !== "FAIL-BUSY") {
                     if (scanned !== "OK") {
                         this.#debug('It has not been possible to scan Wi-Fi networks')
@@ -406,7 +406,7 @@ class M77RaspberryWIFI {
 
             const saved = await this.#wpa('list_networks')
 
-            if (saved === false) { resolve({ success: false, msg: `It was not possible to obtain the list of saved Wi-Fi networks`, data: [] }); return false }
+            if (saved === false) { resolve({ success: false, msg: `It was not possible to obtain the list of saved Wi-Fi networks in inteface ${this.#device}`, data: [] }); return false }
 
 
             const savedArr = saved.split(/\r?\n/)
@@ -487,7 +487,7 @@ class M77RaspberryWIFI {
             if (this.#ready === false) { resolve(this.#responseNoInterface()); return false }
 
             const status = await this.status()
-            if (status.success === false) { resolve({ success: false, msg: `Cannot determine if interface  ${this.#device} is connected`, data: false }); return false }
+            if (status.success === false) { resolve({ success: false, msg: `Cannot determine if interface ${this.#device} is connected`, data: false }); return false }
 
             const result = status.data.wpa_state === 'COMPLETED' && this.#validIPaddr(status.data.ip_address)
 
@@ -500,10 +500,10 @@ class M77RaspberryWIFI {
             if (this.#ready === false) { resolve(this.#responseNoInterface()); return false }
 
             const scanStatus = await this.#scanStatus()
-            if (scanStatus === false) { resolve({ success: false, msg: `Failed to get Wi-Fi scan`, data: [] }); return false }
+            if (scanStatus === false) { resolve({ success: false, msg: `Failed to get Wi-Fi scan in device ${this.#device}`, data: [] }); return false }
 
             const scanned = await this.#wpa('scan_results')
-            if (scanned === false) { resolve({ success: false, msg: `It was not possible to obtain the list of the scanned Wi-Fi networks`, data: [] }); return false }
+            if (scanned === false) { resolve({ success: false, msg: `It was not possible to obtain the list of the scanned Wi-Fi networks in inteface ${this.#device}`, data: [] }); return false }
 
             const scannedArr = scanned.split(/\r?\n/)
             const headers = scannedArr.shift().replace(/\s/g, '').split(/\//g)
@@ -544,7 +544,7 @@ class M77RaspberryWIFI {
             }
 
             const scan = await this.scan()
-            if (scan.success === false) { resolve({ success: false, msg: `It was not possible to obtain the list grouped by type of the scanned Wi-Fi networks`, data: [] }); return false }
+            if (scan.success === false) { resolve({ success: false, msg: `It was not possible to obtain the list grouped by type of the scanned Wi-Fi networks in device ${this.#device}`, data: [] }); return false }
 
             const { data } = await this.status()
             const ssid = data.ssid
@@ -599,7 +599,7 @@ class M77RaspberryWIFI {
             this.#debug(`Delete all Wi-Fi network saved in ${this.#device}`)
 
             const remove = await this.#removeAllNetworks()
-            if (remove === false) { resolve({ success: false, msg: `Could not delete saved Wi-Fi networks in ${$this.#device}` }); return false }
+            if (remove === false) { resolve({ success: false, msg: `Could not delete saved Wi-Fi networks in ${this.#device}` }); return false }
 
             const saveConfig = await this.#wpa(`save_config`)
             if (saveConfig.trim() !== 'OK') {
