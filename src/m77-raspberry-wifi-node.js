@@ -24,7 +24,7 @@ class M77RaspberryWIFI {
 
     #validateDevice() {
         return new Promise((resolve, reject) => {
-            const command = `iw dev | grep -E 'Interface ${this.#device}$'`
+            const command = `/usr/sbin/iw dev | grep -E 'Interface ${this.#device}$'`
             this.#exec(command, (err, stdout, stderr) => {
                 stdout = stdout.replace(/\t/g, '').trim().split(/\r?\n/)
                 if (err !== null || stdout.length < 1) {
@@ -42,7 +42,7 @@ class M77RaspberryWIFI {
                 this.#debug(`The ${this.#device} interface does not exist.`, 'Please execute the listInterfaces() method to get the list of available Wifi interfaces.')
                 resolve(false)
             } else {
-                const command = `wpa_cli -i ${this.#device} ${action}`
+                const command = `/usr/sbin/wpa_cli -i ${this.#device} ${action}`
                 this.#exec(command, (err, stdout, stderr) => {
                     if (err !== null) {
                         this.#debug(stderr)
@@ -366,7 +366,7 @@ class M77RaspberryWIFI {
 
     listInterfaces() {
         return new Promise((resolve, reject) => {
-            const command = `iw dev | grep -E 'Interface '`
+            const command = `/usr/sbin/iw dev | grep -E 'Interface '`
             this.#exec(command, (err, stdout, stderr) => {
                 stdout = stdout.replace(/\t/g, '').replace(/(Interface )/g, '').trim().split(/\r?\n/)
                 if (err !== null || stdout.length < 1) {
