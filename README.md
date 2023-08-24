@@ -59,7 +59,7 @@ options:
 - *device* - The interface to use - default **wlan0**
 - *debugLevel* - The debug level displayed on the console (0 - Nothing, 1 - Basic, 2 - Full) - Default **2**
 - *scan_timeout* - Maximum waiting time in milliseconds to scan Wi-Fi networks - Default **15000**
-- *connect_timeout* - Maximum waiting time in milliseconds to scan Wi-Fi networks - Default **15000**
+- *connect_timeout* - Maximum waiting time in milliseconds to scan Wi-Fi networks - Default **45000**
 ```
 const init = await wifi.init({ device: "wlan0", debugLevel: 0 })
 console.log(init)
