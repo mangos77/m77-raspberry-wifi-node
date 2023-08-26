@@ -66,7 +66,7 @@ class M77RaspberryWIFI {
                     return false
                 }
                 scanned = await this.#wpa('scan')
-                try { scanned = scanned.trim() } catch(e){}
+                try { scanned = scanned.trim() } catch (e) { }
                 if (scanned !== "FAIL-BUSY") {
                     if (scanned !== "OK") {
                         this.#debug('It has not been possible to scan Wi-Fi networks')
@@ -153,6 +153,68 @@ class M77RaspberryWIFI {
                 resolve(false)
             }
         })
+    }
+
+    #typeWifi(freq = 0) {
+        const ranges = {
+            wifi_24: { min: 2400, max: 2500 },
+            wifi_5: { min: 5150, max: 5850 },
+            wifi_6: { min: 5925, max: 7125 },
+        }
+
+        let typeWifi = ""
+        switch (true) {
+            case freq >= ranges.wifi_24.min && freq <= ranges.wifi_24.max: typeWifi = "2.4"; break;
+            case freq >= ranges.wifi_5.min && freq <= ranges.wifi_5.max: typeWifi = "5"; break;
+            case freq >= ranges.wifi_6.min && freq <= ranges.wifi_6.max: typeWifi = "6"; break;
+            default: typeWifi = "other";
+
+        }
+        return typeWifi
+    }
+
+    #signal_poll(idNetwork = 0, signallevel = 0) {
+        return new Promise(async (resolve, reject) => {
+            let rssi = await this.#wpa(`signal_poll ${idNetwork}`)
+            try {
+                const rssiArr = rssi.split(/\r?\n/)
+
+                if (rssiArr.length > 1) {
+                    const rssiJSON = {}
+
+                    rssiArr.map(row => {
+                        const rowArr = row.split(/=/g)
+                        rssiJSON[rowArr[0]] = rowArr[1]
+                    })
+
+                    try {
+                        rssiJSON.RSSI = parseInt(rssiJSON.RSSI)
+                        rssiJSON.LINKSPEED = parseInt(rssiJSON.LINKSPEED)
+                        rssiJSON.FREQUENCY = parseInt(rssiJSON.FREQUENCY)
+                        rssiJSON.RSSI = parseInt(rssiJSON.RSSI)
+                    } catch (e) { }
+
+                    resolve(rssiJSON)
+                } else {
+                    resolve(false)
+                }
+            } catch (e) {
+                resolve(false)
+                return false
+            }
+        })
+    }
+
+    #signalStrength(signallevel = 0) {
+        signallevel = parseInt(signallevel)
+        let signalStrength = 0
+        switch (true) {
+            case signallevel > -50: signalStrength = 4; break;
+            case signallevel > -70: signalStrength = 3; break;
+            case signallevel > -85: signalStrength = 2; break;
+            case signallevel <= -85: signalStrength = 1; break;
+        }
+        return signalStrength
     }
 
     init(config = {}) {
@@ -396,6 +458,23 @@ class M77RaspberryWIFI {
                 statusJSON[rowArr[0]] = rowArr[1]
             })
 
+            try {
+                statusJSON.freq ? statusJSON.freq = parseInt(statusJSON.freq) : false
+                statusJSON.id ? statusJSON.id = parseInt(statusJSON.id) : false
+
+                if (statusJSON.freq) {
+                    statusJSON.typeGHz = this.#typeWifi(statusJSON.freq)
+
+                    const signal_poll = await this.#signal_poll(statusJSON.id, statusJSON.freq)
+
+                    if (signal_poll.RSSI) {
+                        statusJSON.signallevel = signal_poll.RSSI
+                        statusJSON.signalStrength = this.#signalStrength(statusJSON.signallevel)
+                    }
+
+                }
+            } catch (e) { }
+
             resolve({ success: true, msg: `Got interface status ${this.#device}`, data: statusJSON })
         })
     }
@@ -518,17 +597,21 @@ class M77RaspberryWIFI {
                         net.open = rowArr[i].search(/^(?!.*\bWPA\b)(?!.*\bWPA2\b).*ESS.*$/) >= 0 ? true : false
                     }
                 }
+
+                try {
+                    net.frequency = parseInt(net.frequency)
+                    net.signallevel = parseInt(net.signallevel)
+                } catch (e) { }
+
+                net.typeGHz = this.#typeWifi(net.frequency)
+                net.signalStrength = this.#signalStrength(net.signallevel)
+
+                net.ssid = net.ssid.replace(/\\x00/g, '')
+
                 return net
             })
 
-            const cleanResult = result.map(row => {
-                try {
-                    row.ssid = row.ssid.replace(/\\x00/g, '')
-                } catch (e) { }
-                return row
-            })
-
-            resolve({ success: true, msg: `List of scanned Wi-Fi networks was obtained`, data: cleanResult })
+            resolve({ success: true, msg: `List of scanned Wi-Fi networks was obtained`, data: result })
 
         })
     }
@@ -550,30 +633,22 @@ class M77RaspberryWIFI {
             const ssid = data.ssid
             const freq = data.freq
 
-            scan.data.sort((a, b) => b.signallevel - a.signallevel)
+            const ordered = scan.data.sort((a, b) => b.signallevel - a.signallevel)
 
-            const types = { wifi_24: [], wifi_5: [], wifi_6: [], wifi_other: [] }
 
-            scan.data.map(result => {
-                if (result.frequency >= ranges.wifi_24.min && result.frequency <= ranges.wifi_24.max) {
-                    result.current = result.ssid == ssid && result.frequency == freq
-                    result.current ? types.wifi_24.unshift(result) : types.wifi_24.push(result)
-                } else if (result.frequency >= ranges.wifi_5.min && result.frequency <= ranges.wifi_5.max) {
-                    result.current = result.ssid == ssid && result.frequency == freq
-                    result.current ? types.wifi_5.unshift(result) : types.wifi_5.push(result)
-                } else if (result.frequency >= ranges.wifi_6.min && result.frequency <= ranges.wifi_6.max) {
-                    result.current = result.ssid == ssid && result.frequency == freq
-                    result.current ? types.wifi_6.unshift(result) : types.wifi_6.push(result)
-                } else {
-                    result.current = result.bssid == ssid && result.frequency == freq
-                    result.current ? types.wifi_other.unshift(result) : types.wifi_other.push(result)
-                }
+            const types = {
+                wifi_24: [],
+                wifi_5: [],
+                wifi_6: [],
+                wifi_other: []
+            }
+
+            ordered.map(result => {
+                let typeBlock = `wifi_${result.typeGHz.replace(".", "")}`
+                result.current = result.ssid == ssid && result.frequency == freq
+                result.current ? types[typeBlock].unshift(result) : types[typeBlock].push(result)
             })
 
-            if (types.wifi_24.length == 0) delete types.wifi_24
-            if (types.wifi_5.length == 0) delete types.wifi_5
-            if (types.wifi_6.length == 0) delete types.wifi_6
-            if (types.wifi_other.length == 0) delete types.wifi_other
 
             Object.keys(types).forEach(key => {
                 const ssidSet = new Set()
@@ -586,7 +661,9 @@ class M77RaspberryWIFI {
                         return true;
                     }
                     return false;
-                });
+                })
+
+                if (types[key].length < 1) try { delete types[key] } catch (e) { }
             })
 
             resolve({ success: true, msg: `A list grouped by type of the scanned Wi-Fi networks was obtained`, data: types })

@@ -103,9 +103,9 @@ Response:
   msg: 'Got interface status wlan0',
   data: {
     bssid: '48:45:4e:8f:4b:e7',
-    freq: '5240',
+    freq: 5240,
     ssid: 'mangos77',
-    id: '0',
+    id: 0,
     mode: 'station',
     pairwise_cipher: 'CCMP',
     group_cipher: 'CCMP',
@@ -115,7 +115,10 @@ Response:
     p2p_device_address: 'da:3a:e8:35:d0:b7',
     address: 'da:3a:e8:35:d0:b7',
     uuid: 'aefc91bf-693f-57b0-3542-eeb8bc7e495a',
-    ieee80211ac: '1'
+    ieee80211ac: '1',
+    typeGHz: '5',
+    signallevel: -34,
+    signalStrength: 4
   }
 }
 ```
@@ -191,7 +194,12 @@ Response:
 
 
 ### scan()
-Delivery result of all Wi-Fi networks available to connect
+Delivery result of all Wi-Fi networks available to connect.
+
+Data is added in the response on each of the detected networks:
+- **typeGHz** - (2.4, 5, etc.)
+- **signalStrength** - [1 (strong) - 5 (weak)]
+- **current** - [true | false] depending on whether it is the network you are connected to
 ```
 const scan = await wifi.scan()
 console.log(scan)
@@ -203,22 +211,28 @@ Response:
   msg: 'List of scanned Wi-Fi networks was obtained',
   data: [
     {
-      bssid: '48:22:34:7d:4c:c7',
-      frequency: '5240',
-      signallevel: '-33',
-      flags: '[WPA2-PSK+FT/PSK-CCMP][WPS][ESS]',
-      open: false,
-      ssid: 'mangos77'
+      "bssid": "48:22:34:7d:4c:c7",
+      "frequency": 5240,
+      "signallevel": -33,
+      "flags": "[WPA2-PSK+FT/PSK-CCMP][WPS][ESS]",
+      "open": false,
+      "ssid": "mangos77",
+      "typeGHz": "5",
+      "signalStrength": 1,
+      "current": false
     },
     ...
     ...
     {
-      bssid: '0e:96:e6:43:44:e4',
-      frequency: '2412',
-      signallevel: '-80',
-      flags: '[ESS]',
-      open: true,
-      ssid: 'My Open Net'
+      "bssid": "0e:96:e6:43:44:e4",
+      "frequency": 2412,
+      "signallevel": -88,
+      "flags": "[ESS]",
+      "open": true,
+      "ssid": "My Open Net",
+      "typeGHz": "5",
+      "signalStrength": 2,
+      "current": false
     }
   ]
 }
@@ -227,6 +241,11 @@ Response:
 ### scanInTypes()
 Returns the available Wi-Fi networks **grouped by type 2.4, 5, etc.**.
 **They are delivered ordered in each block by the strength of the signal**
+
+Data is added in the response on each of the detected networks:
+- **typeGHz** - (2.4, 5, etc.)
+- **signalStrength** - [1 (strong) - 5 (weak)]
+- **current** - [true | false] depending on whether it is the network you are connected to
 ```
 const inTypes = await wifi.scanInTypes()
 console.log(inTypes)
@@ -241,11 +260,13 @@ Response:
     "wifi_24": [
       {
         "bssid": "48:26:14:8d:4c:d8",
-        "frequency": "2417",
-        "signallevel": "-26",
+        "frequency": 2417,
+        "signallevel": -26,
         "flags": "[WPA2-PSK+FT/PSK-CCMP][WPS][ESS]",
         "open": false,
         "ssid": "mangos77",
+        "typeGHz": "2.4",
+        "signalStrength": 1,
         "current": false
       },
       ...
@@ -253,14 +274,17 @@ Response:
     "wifi_5": [
       {
         "bssid": "48:22:78:8e:6a:bf",
-        "frequency": "5240",
-        "signallevel": "-81",
+        "frequency": 5240,
+        "signallevel": -87,
         "flags": "[WPA2-PSK+FT/PSK-CCMP][WPS][ESS]",
         "open": false,
         "ssid": "mangos77",
+        "typeGHz": "5",
+        "signalStrength": 2,
         "current": true
       },
-      ...    ]
+      ...    
+    ]
   }
 }
 ```
