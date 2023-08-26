@@ -291,6 +291,7 @@ configuración:
 - *psk* - Contraseña de la red Wifi - **Dejar vacío en caso de red abierta**
 - *removeAllNetworks* - [true | false] Si se desea que elimine todas las redes guardadas - Por defecto **false**
 - *hidden* - [true | false] Para indicar si se trata o no de una red oculta - Por defecto **false**
+- *bssid* - Usar el bssid en caso que se deseara fijar la conexión, *o en el caso que el ssid use dos bandas y se necsite conectar a una banda determinada* - Por defecto '' (no ata la conexión al bssid)
 
 ```
 const connect = await wifi.connect({ ssid: "mangos77_other", psk: "sd343dsdsss"})

@@ -296,6 +296,7 @@ config:
 - *psk* - Wifi network password - **Leave empty in case of open network**
 - *removeAllNetworks* - [true | false] If you want to delete all saved networks - Default **false**
 - *hidden* - [true | false] To indicate whether or not it is a hidden network - By default **false**
+- *bssid* - Use the bssid in case you want to fix the connection, *or in the case that the ssid uses two bands and you need to connect to a specific band* - By default '' (does not bind the connection to the bssid)
 
 ```
 const connect = await wifi.connect({ ssid: "mangos77_other", psk: "sd343dsdsss"})
