@@ -196,7 +196,6 @@ Entrega resultado de todas las redes Wifi disponibles para conectarse
 Se agregan datos en la respuesta en cada una de las redes detectadas: 
 - **typeGHz** - (2.4, 5, etc.)
 - **signalStrength** - [1 (fuerte) - 5 (débil)]
-- **current** - [true | false] dependiendo si es a la red a la que se está conectado
 ```
 const scan = await wifi.scan()
 console.log(scan)
@@ -215,8 +214,7 @@ Respuesta:
       "open": false,
       "ssid": "mangos77",
       "typeGHz": "5",
-      "signalStrength": 1,
-      "current": false
+      "signalStrength": 1
     },
     ...
     ...
@@ -228,8 +226,7 @@ Respuesta:
       "open": true,
       "ssid": "My Open Net",
       "typeGHz": "5",
-      "signalStrength": 2,
-      "current": false
+      "signalStrength": 2
     }
   ]
 }
