@@ -66,7 +66,7 @@ async function init() {
     
     /*
     console.log("\n\Connect:")
-    const connect = await wifi.connect({ ssid: "mangos77", psk: "dfssdsdf44343", hidden: false, removeAllNetworks: false})
+    const connect = await wifi.connect({ ssid: "mangos77", psk: "dfssdsdf44343", bssid: "", hidden: false, removeAllNetworks: false})
     console.log(connect)
     */
     

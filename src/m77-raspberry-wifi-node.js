@@ -242,7 +242,7 @@ class M77RaspberryWIFI {
         const _this = this
         return new Promise(async (resolve, reject) => {
             const startTime = new Date()
-            const configValues = { ...{ ssid: "", psk: "", removeAllNetworks: false, hidden: false }, ...config }
+            const configValues = { ...{ ssid: "", psk: "", bssid: "", removeAllNetworks: false, hidden: false }, ...config }
 
             _this.#debug(`Starting connection to SSID "${configValues.ssid}" with PSK "${configValues.psk}"`)
             configValues.hidden === true ? _this.#debug(`Is a hidden network`) : false
@@ -276,6 +276,13 @@ class M77RaspberryWIFI {
             _this.#debug(`Set SSID "${configValues.ssid}"`)
             if (setSSID === false) { ifError(); return false }
 
+            // set_network bssid
+            //if (configValues.bssid.length == 17) {
+                const setBSSID = await setNetwork(idNetwork, 'bssid', configValues.bssid)
+                _this.#debug(`Set BSSID "${configValues.bssid}"`)
+                if (setBSSID === false) { ifError(); return false }
+            //}
+
             // set_network psk
             if (configValues.psk.length > 0) {
                 const setPSK = await setNetwork(idNetwork, 'psk', configValues.psk)
@@ -286,7 +293,6 @@ class M77RaspberryWIFI {
                 _this.#debug(`No password set as "${configValues.ssid}" is an open network`)
                 if (asHidden === false) { ifError(); return false }
             }
-
 
             // set_network priority
             const setPriority = await setNetwork(idNetwork, 'priority', idNetwork)
@@ -350,7 +356,8 @@ class M77RaspberryWIFI {
             function setNetwork(idNetwork, key = "", value = "") {
                 return new Promise(async (resolve, reject) => {
                     let setValue = await _this.#wpa(`set_network ${idNetwork} ${key} ${value}`)
-                    if (setValue.trim() !== 'OK') {
+                    try{setValue = setValue.trim()} catch(e){}
+                    if (setValue !== false && setValue !== 'OK') {
                         setValue = await _this.#wpa(`set_network ${idNetwork} ${key} '${value}'`)
                         if (setValue.trim() !== 'OK') {
                             setValue = await _this.#wpa(`set_network ${idNetwork} ${key} '"${value}"'`)
