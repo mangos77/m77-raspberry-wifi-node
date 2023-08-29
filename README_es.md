@@ -2,6 +2,14 @@
 
 Es un módulo que he desarrollado en **node.js** para configurar red Wifi de **Raspberry Pi** que usa **wpa_cli** de **wpa_supplicant**.
 
+___
+**Ya está dispponible la implementación de este módulo para crear una API con todas las funcionalidades para node.js con express.**
+
+La puedes encontrar en [***api-m77-raspberry-wifi-node***](https://github.com/mangos77/api-m77-raspberry-wifi-node)
+
+___
+
+
 ### ¿Por qué?
 
 Porque me he beneficiado mucho del trabajo de otras personas y organizaciones que ofrecen módulos de desarrollo y quiero regresar algo a la comunidad.

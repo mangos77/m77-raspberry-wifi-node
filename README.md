@@ -7,6 +7,13 @@
 
 It is a module that I have developed in **node.js** to configure a **Raspberry Pi** Wifi network that uses **wpa_cli** from **wpa_supplicant**.
 
+___
+**Implementation of this module is now available to create a fully featured API for node.js with express.**
+
+You can find it at [***api-m77-raspberry-wifi-node***](https://github.com/mangos77/api-m77-raspberry-wifi-node)
+
+___
+
 ### Why do I do it?
 
 Because I have benefited a lot from the work of other people and organizations that offer development modules and I want to give something back to the community.
