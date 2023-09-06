@@ -46,11 +46,16 @@ async function init() {
     */
 
     /*
+    console.log("\n\nScan Uniques Ordered:")
+    const availableUniques = await wifi.scanUniques()
+    console.log(availableUniques)
+    */
+
+    /*
     console.log("\n\nScan In Types:")
     const inTypes = await wifi.scanInTypes()
     console.log(JSON.stringify(inTypes, null, 2))
     */
-
 
     /*
     console.log("\n\nDisconnect:")

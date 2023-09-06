@@ -278,9 +278,9 @@ class M77RaspberryWIFI {
 
             // set_network bssid
             //if (configValues.bssid.length == 17) {
-                const setBSSID = await setNetwork(idNetwork, 'bssid', configValues.bssid)
-                _this.#debug(`Set BSSID "${configValues.bssid}"`)
-                if (setBSSID === false) { ifError(); return false }
+            const setBSSID = await setNetwork(idNetwork, 'bssid', configValues.bssid)
+            _this.#debug(`Set BSSID "${configValues.bssid}"`)
+            if (setBSSID === false) { ifError(); return false }
             //}
 
             // set_network psk
@@ -356,7 +356,7 @@ class M77RaspberryWIFI {
             function setNetwork(idNetwork, key = "", value = "") {
                 return new Promise(async (resolve, reject) => {
                     let setValue = await _this.#wpa(`set_network ${idNetwork} ${key} ${value}`)
-                    try{setValue = setValue.trim()} catch(e){}
+                    try { setValue = setValue.trim() } catch (e) { }
                     if (setValue !== false && setValue !== 'OK') {
                         setValue = await _this.#wpa(`set_network ${idNetwork} ${key} '${value}'`)
                         if (setValue.trim() !== 'OK') {
@@ -464,6 +464,8 @@ class M77RaspberryWIFI {
                 const rowArr = row.split(/=/g)
                 statusJSON[rowArr[0]] = rowArr[1]
             })
+
+            statusJSON.connected = statusJSON.bssid? true: false
 
             try {
                 statusJSON.freq ? statusJSON.freq = parseInt(statusJSON.freq) : false
@@ -588,6 +590,13 @@ class M77RaspberryWIFI {
             const scanStatus = await this.#scanStatus()
             if (scanStatus === false) { resolve({ success: false, msg: `Failed to get Wi-Fi scan in device ${this.#device}`, data: [] }); return false }
 
+            const status = await this.status()
+            const currentConnection = {
+                bssid: status.data.bssid || '',
+                ssid: status.data.ssid || '',
+                freq: status.data.freq || 0
+            }
+
             const scanned = await this.#wpa('scan_results')
             if (scanned === false) { resolve({ success: false, msg: `It was not possible to obtain the list of the scanned Wi-Fi networks in inteface ${this.#device}`, data: [] }); return false }
 
@@ -613,10 +622,16 @@ class M77RaspberryWIFI {
                 net.typeGHz = this.#typeWifi(net.frequency)
                 net.signalStrength = this.#signalStrength(net.signallevel)
 
-                net.ssid = net.ssid.replace(/\\x00/g, '')
+                try { net.ssid = net.ssid.replace(/\\x00/g, '') } catch (e) { }
 
                 return net
             })
+
+            result.sort((a, b) => b.signallevel - a.signallevel)
+
+            result.map((net => {
+                net.current = net.bssid == currentConnection.bssid && net.frequency == currentConnection.freq ? true : false
+            }))
 
             resolve({ success: true, msg: `List of scanned Wi-Fi networks was obtained`, data: result })
 
@@ -625,55 +640,42 @@ class M77RaspberryWIFI {
 
     scanInTypes() {
         return new Promise(async (resolve, reject) => {
-            if (this.#ready === false) { resolve(this.#responseNoInterface()); return false }
+            const scanUniques = await this.scanUniques()
 
-            const ranges = {
-                wifi_24: { min: 2400, max: 2500 },
-                wifi_5: { min: 5150, max: 5850 },
-                wifi_6: { min: 5925, max: 7125 },
+            const scanInGroups = {}
+
+            for(let i = 0; i < scanUniques.data.length; i++){
+                let key = scanUniques.data[i].typeGHz.replace(".", "")
+
+                if(scanInGroups[`wifi_${key}`] === undefined) 
+                    scanInGroups[`wifi_${key}`] = new Array(scanUniques.data[i])
+                else
+                    scanInGroups[`wifi_${key}`].push(scanUniques.data[i])
             }
+            resolve(scanInGroups)
+        })
+    }
+
+    scanUniques() {
+        return new Promise(async (resolve, reject) => {
+            if (this.#ready === false) { resolve(this.#responseNoInterface()); return false }
 
             const scan = await this.scan()
             if (scan.success === false) { resolve({ success: false, msg: `It was not possible to obtain the list grouped by type of the scanned Wi-Fi networks in device ${this.#device}`, data: [] }); return false }
 
-            const { data } = await this.status()
-            const ssid = data.ssid
-            const freq = data.freq
+            const result = scan.data.filter(net => net.current === true)
+            const noHidden = scan.data.filter(net => net.ssid != '')
 
-            const ordered = scan.data.sort((a, b) => b.signallevel - a.signallevel)
+            for (let i = 0; i < noHidden.length; i++) {
+                let ssid = noHidden[i].ssid
+                let freq = noHidden[i].frequency
 
+                let detectDup = result.find(net => net.ssid == ssid && net.frequency == freq)
 
-            const types = {
-                wifi_24: [],
-                wifi_5: [],
-                wifi_6: [],
-                wifi_other: []
+                if (typeof detectDup != "object") result.push(noHidden[i])
             }
 
-            ordered.map(result => {
-                let typeBlock = `wifi_${result.typeGHz.replace(".", "")}`
-                result.current = result.ssid == ssid && result.frequency == freq
-                result.current ? types[typeBlock].unshift(result) : types[typeBlock].push(result)
-            })
-
-
-            Object.keys(types).forEach(key => {
-                const ssidSet = new Set()
-                types[key] = types[key].filter((wifi) => {
-                    try {
-                        if (wifi.ssid.trim().length < 1) return false
-                    } catch (e) { return false }
-                    if (!ssidSet.has(wifi.ssid)) {
-                        ssidSet.add(wifi.ssid);
-                        return true;
-                    }
-                    return false;
-                })
-
-                if (types[key].length < 1) try { delete types[key] } catch (e) { }
-            })
-
-            resolve({ success: true, msg: `A list grouped by type of the scanned Wi-Fi networks was obtained`, data: types })
+            resolve({ success: true, msg: `A list grouped by type of the scanned Wi-Fi networks was obtained`, data: result })
         })
     }
 
