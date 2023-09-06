@@ -97,7 +97,8 @@ Respuesta:
     wpa_state: 'DISCONNECTED',
     p2p_device_address: 'da:3a:e8:35:d0:b7',
     address: 'da:3a:e8:35:d0:b7',
-    uuid: 'aefc91bf-693f-57b0-3542-eeb8bc7e495a'
+    uuid: 'aefc91bf-693f-57b0-3542-eeb8bc7e495a',
+    connected: false
   }
 }
 ```
@@ -121,6 +122,7 @@ Respuesta:
     address: 'da:3a:e8:35:d0:b7',
     uuid: 'aefc91bf-693f-57b0-3542-eeb8bc7e495a',
     ieee80211ac: '1',
+    connected: true,
     typeGHz: '5',
     signallevel: -34,
     signalStrength: 4
@@ -199,7 +201,7 @@ Respuesta:
 
 
 ### scan()
-Entrega resultado de todas las redes Wifi disponibles para conectarse
+Entrega resultado de todas las redes Wifi disponibles para conectarse ordenadas por fuerza de señal.
 
 Se agregan datos en la respuesta en cada una de las redes detectadas: 
 - **typeGHz** - (2.4, 5, etc.)
@@ -222,7 +224,8 @@ Respuesta:
       "open": false,
       "ssid": "mangos77",
       "typeGHz": "5",
-      "signalStrength": 1
+      "signalStrength": 1,
+      "current": true
     },
     ...
     ...
@@ -234,7 +237,49 @@ Respuesta:
       "open": true,
       "ssid": "My Open Net",
       "typeGHz": "5",
-      "signalStrength": 2
+      "signalStrength": 2,
+      "current": false
+    }
+  ]
+}
+```
+
+
+### scanUniques()
+Muestra listado de todas las redes disponibles no ocultas y sin duplicados de ssid y frecuencia.
+```
+const availableUniques = await wifi.scanUniques()
+console.log(availableUniques)
+```
+
+Respuesta:
+```
+{
+  success: true,
+  msg: 'Got a list of unique and not hidden Wi-Fi networks',
+  data: [
+    {
+      bssid: '48:54:5b:9e:4a:c7',
+      frequency: 5240,
+      signallevel: -39,
+      flags: '[WPA2-PSK+FT/PSK-CCMP][WPS][ESS]',
+      open: false,
+      ssid: 'mangos77',
+      typeGHz: '5',
+      signalStrength: 4,
+      current: true
+    },
+    ...
+    {
+      bssid: '4e:23:b4:9e:4a:c6',
+      frequency: 2417,
+      signallevel: -27,
+      flags: '[WPA2-PSK+FT/PSK-CCMP][ESS]',
+      open: false,
+      ssid: 'mangos77',
+      typeGHz: '2.4',
+      signalStrength: 4,
+      current: false
     }
   ]
 }

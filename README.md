@@ -99,7 +99,8 @@ Response:
     wpa_state: 'DISCONNECTED',
     p2p_device_address: 'da:3a:e8:35:d0:b7',
     address: 'da:3a:e8:35:d0:b7',
-    uuid: 'aefc91bf-693f-57b0-3542-eeb8bc7e495a'
+    uuid: 'aefc91bf-693f-57b0-3542-eeb8bc7e495a',
+    connected: false
   }
 }
 ```
@@ -123,6 +124,7 @@ Response:
     address: 'da:3a:e8:35:d0:b7',
     uuid: 'aefc91bf-693f-57b0-3542-eeb8bc7e495a',
     ieee80211ac: '1',
+    connected: true,
     typeGHz: '5',
     signallevel: -34,
     signalStrength: 4
@@ -201,7 +203,7 @@ Response:
 
 
 ### scan()
-Delivery result of all Wi-Fi networks available to connect.
+Delivers the result of all available Wi-Fi networks to connect ordered by signal strength.
 
 Data is added in the response on each of the detected networks:
 - **typeGHz** - (2.4, 5, etc.)
@@ -224,7 +226,8 @@ Response:
       "open": false,
       "ssid": "mangos77",
       "typeGHz": "5",
-      "signalStrength": 1
+      "signalStrength": 1,
+      "current": true
     },
     ...
     ...
@@ -236,11 +239,53 @@ Response:
       "open": true,
       "ssid": "My Open Net",
       "typeGHz": "5",
-      "signalStrength": 2
+      "signalStrength": 2,
+      "current": false
     }
   ]
 }
 ```
+
+### scanUniques()
+Shows list of all available networks not hidden and without duplicates of ssid and frequency.
+```
+const availableUniques = await wifi.scanUniques()
+console.log(availableUniques)
+```
+
+Response:
+```
+{
+  success: true,
+  msg: 'Got a list of unique and not hidden Wi-Fi networks',
+  data: [
+    {
+      bssid: '48:54:5b:9e:4a:c7',
+      frequency: 5240,
+      signallevel: -39,
+      flags: '[WPA2-PSK+FT/PSK-CCMP][WPS][ESS]',
+      open: false,
+      ssid: 'mangos77',
+      typeGHz: '5',
+      signalStrength: 4,
+      current: true
+    },
+    ...
+    {
+      bssid: '4e:23:b4:9e:4a:c6',
+      frequency: 2417,
+      signallevel: -27,
+      flags: '[WPA2-PSK+FT/PSK-CCMP][ESS]',
+      open: false,
+      ssid: 'mangos77',
+      typeGHz: '2.4',
+      signalStrength: 4,
+      current: false
+    }
+  ]
+}
+```
+
 
 ### scanInTypes()
 Returns the available Wi-Fi networks **grouped by type 2.4, 5, etc.**.
