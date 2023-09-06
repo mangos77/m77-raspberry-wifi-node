@@ -675,7 +675,7 @@ class M77RaspberryWIFI {
                 if (typeof detectDup != "object") result.push(noHidden[i])
             }
 
-            resolve({ success: true, msg: `A list grouped by type of the scanned Wi-Fi networks was obtained`, data: result })
+            resolve({ success: true, msg: `Got a list of unique and not hidden Wi-Fi networks`, data: result })
         })
     }
 
