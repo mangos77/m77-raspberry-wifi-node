@@ -1,3 +1,6 @@
+> ** Deprecated: In current versions of Raspberry OS wpa_cli is no longer used, nmcli is used instead. Please use the module [**m77-raspberry-wifi-node-nmcli**](https://github.com/mangos77/m77-raspberry-wifi-node-nmcli)
+___
+
 ***Si quieres ver el documento en español, por favor consulta el archivo README_es.md***
 
 ***My natural language is Spanish. All texts have been translated with Google Translator.***
